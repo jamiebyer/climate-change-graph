@@ -4,7 +4,7 @@
 #forcing_checklist label:nth-child(4) {color: deepskyblue;}
 #forcing_checklist label:nth-child(5) {color: cadetblue;}
 #forcing_checklist label:nth-child(6) {color: orange;}
-#natural_checklist label:nth-child(7) {color: red;}
+#forcing_checklist label:nth-child(7) {color: red;}
 
 
 #forcing_radiobuttons label:nth-child(1) {color: mediumslateblue;}
@@ -13,4 +13,4 @@
 #forcing_radiobuttons label:nth-child(4) {color: deepskyblue;}
 #forcing_radiobuttons label:nth-child(5) {color: cadetblue;}
 #forcing_radiobuttons label:nth-child(6) {color: orange;}
-#natural_radiobuttons label:nth-child(7) {color: red;}
+#forcing_radiobuttons label:nth-child(7) {color: red;}

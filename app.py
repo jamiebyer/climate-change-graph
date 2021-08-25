@@ -141,6 +141,15 @@ def render_content(tab):
                     ],
                     value=[],
                 ),
+
+                dcc.Checklist(
+                    id='add_forcings',
+                    options=[
+                        {'label': 'Add Forcings', 'value': 'add_forcings'},
+                    ],
+                    value=[],
+                    style={'font-weight': 'bold', 'margin-top': '50px'}
+                ),
             ], style={'width': '20%', 'display': 'inline-block', 'vertical-align': 'middle'}),
 
         ])
@@ -186,6 +195,31 @@ def update_factors(fig, factors):
     return fig
 
 
+def add_factors(fig, factors):
+    y = [0]*len(climate_forcings_data)
+
+    name = ['OC', 'S', 'V', 'LU', 'O', 'A', 'GG', 'N', 'H', 'ALL']
+    df_name = ['Orbital changes', 'Solar', 'Volcanic', 'Land use', 'Ozone', 'Anthropogenic tropospheric aerosol', 'Greenhouse gases',
+               'Natural', 'Human', 'All forcings']
+    for i in range(10):
+        if name[i] in factors:
+            y += climate_forcings_data[df_name[i]]
+
+    new_fig = px.line(x=climate_forcings_data['Year'], y=y, color_discrete_sequence=['purple'])
+    new_fig_error = go.Figure([
+        go.Scatter(name='Upper Bound', x=climate_forcings_data['Year'],
+                   y=y + climate_forcings_data['Error'],
+                   mode='lines', marker=dict(color="#444"), line=dict(width=0), showlegend=False),
+        go.Scatter(name='Lower Bound', x=climate_forcings_data['Year'],
+                   y=y - climate_forcings_data['Error'],
+                   marker=dict(color="#444"), line=dict(width=0), mode='lines', fillcolor='rgba(128, 0, 128, 0.2)',
+                   fill='tonexty', showlegend=False)
+    ])
+    fig.add_traces(new_fig_error.data)
+    fig.add_trace(new_fig.data[0])
+    return fig
+
+
 @app.callback(
     Output(component_id='learn_graph', component_property='figure'),
     Input(component_id='forcing_radiobuttons', component_property='value'),
@@ -211,14 +245,17 @@ def update_plot(forcing):
 @app.callback(
     Output(component_id='explore_graph', component_property='figure'),
     Input(component_id='forcing_checklist', component_property='value'),
+    Input(component_id='add_forcings', component_property='value'),
 )
-def update_plot(forcings):
-    factors = forcings
-
-    #fig = px.line(land_ocean_data, x='Year', y='Annual_Mean', color_discrete_sequence=['black'])
+def update_plot(forcings, add_forcings):
     fig = px.line()
-    fig.update_layout(plot_bgcolor='rgb(255, 255, 255)', yaxis_zeroline=True, yaxis_zerolinecolor='gainsboro', yaxis_showline=True, yaxis_linecolor='gainsboro')
-    fig = update_factors(fig, factors)
+    fig.update_layout(plot_bgcolor='rgb(255, 255, 255)', yaxis_zeroline=True, yaxis_zerolinecolor='gainsboro',
+                      yaxis_showline=True, yaxis_linecolor='gainsboro')
+
+    if add_forcings != ['add_forcings']:
+        fig = update_factors(fig, forcings)
+    elif len(forcings) > 0:
+        fig = add_factors(fig, forcings)
     figTemp = px.line(land_ocean_data, x='Year', y='Annual_Mean', color_discrete_sequence=['black'])
     fig.add_trace(figTemp.data[0])
     fig.update_yaxes(title='Temperature (C)', range=[-1.2, 1.2])
