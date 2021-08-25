@@ -70,15 +70,8 @@ def render_content(tab):
             html.Div([
                 dcc.Graph(
                     id='learn_graph',
-                    figure={
-                        'layout': {
-                            'yaxis': {
-                                'range': [-5, 5],
-                                'autorange': False
-                            }
-                        }
-                    },
                     config={
+                        'displayModeBar': True,
                         'doubleClick': 'reset',  # 'reset', 'autosize' or 'reset+autosize', False
                     },
                 ),
@@ -113,15 +106,9 @@ def render_content(tab):
             html.Div([
                 dcc.Graph(
                     id='explore_graph',
-                    figure={
-                        'layout': {
-                            'yaxis': {
-                                'range': [-5, 5],
-                                'autorange': False
-                            }
-                        }
-                    },
                     config={
+                        'displayModeBar': True,
+                        'modeBarButtonsToAdd': ['drawline', 'drawcircle', 'eraseshape'],
                         'doubleClick': 'reset',  # 'reset', 'autosize' or 'reset+autosize', False
                     },
                 ),
@@ -265,6 +252,11 @@ def update_plot(forcings, add_forcings):
                        text="<b>observed<br>temperature</b>",
                        showarrow=True,
                        arrowhead=1)
+
+    fig.update_layout(
+        #dragmode='drawline',
+        newshape=dict(line_color='magenta'),
+    )
 
     return fig
 
