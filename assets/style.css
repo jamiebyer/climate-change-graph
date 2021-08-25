@@ -1,0 +1,22 @@
+#natural_checklist label:nth-child(1) {color: deepskyblue;}
+#natural_checklist label:nth-child(2) {color: orange;}
+#natural_checklist label:nth-child(3) {color: red;}
+#natural_radiobuttons label:nth-child(1) {color: deepskyblue;}
+#natural_radiobuttons label:nth-child(2) {color: orange;}
+#natural_radiobuttons label:nth-child(3) {color: red;}
+
+#human_checklist label:nth-child(1) {color: sienna;}
+#human_checklist label:nth-child(2) {color: cadetblue;}
+#human_checklist label:nth-child(3) {color: mediumslateblue;}
+#human_checklist label:nth-child(4) {color: seagreen;}
+#human_radiobuttons label:nth-child(1) {color: sienna;}
+#human_radiobuttons label:nth-child(2) {color: cadetblue;}
+#human_radiobuttons label:nth-child(3) {color: mediumslateblue;}
+#human_radiobuttons label:nth-child(4) {color: seagreen;}
+
+#all_checklist label:nth-child(1) {color: GreenYellow;}
+#all_checklist label:nth-child(2) {color: DarkGrey;}
+#all_checklist label:nth-child(3) {color: purple;}
+#all_radiobuttons label:nth-child(1) {color: GreenYellow;}
+#all_radiobuttons label:nth-child(2) {color: DarkGrey;}
+#all_radiobuttons label:nth-child(3) {color: purple;}
