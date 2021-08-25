@@ -60,7 +60,7 @@ app.layout = html.Div([
         html.Div(id='tabs-content')
     ], style={'width': '80%', 'display': 'inline-block', 'padding': '0 20', 'vertical-align': 'middle', 'margin-bottom': 30, 'margin-right': 50, 'margin-left': 20}),
 
-], style={'width': '1000px'})
+], style={'width': '1200px'})
 
 @app.callback(Output('tabs-content', 'children'),
               Input('tabs', 'value'))
@@ -138,6 +138,14 @@ def render_content(tab):
                     style={'font-weight': 'bold', 'margin-top': '50px'}
                 ),
             ], style={'width': '20%', 'display': 'inline-block', 'vertical-align': 'middle'}),
+
+            html.Div([
+                dcc.Textarea(
+                    id='text_area',
+                    value='Name: \nStudent Number: \nComments: ',
+                    style={'width': '70%', 'height': 150, 'margin-left': '80px'},
+                ),
+            ])
 
         ])
 
@@ -229,12 +237,40 @@ def update_plot(forcing):
 
     return fig
 
+def update_text(fig, text_input):
+    text_output = ''
+    for chr in text_input:
+        if (ord(chr) == 10) | (ord(chr) == 13):
+            text_output += '<br>'
+        else:
+            text_output += chr
+
+    fig.update_layout(margin=dict(b=150))
+    fig.update_layout(annotations=[
+        go.layout.Annotation(
+            text=text_output,
+            align='left',
+            showarrow=False,
+            xref='paper',
+            yref='paper',
+            x=0,
+            y=-0.5,
+            bordercolor='black',
+            borderwidth=1,
+            borderpad=15
+        )
+    ])
+
+    return fig
+
+
 @app.callback(
     Output(component_id='explore_graph', component_property='figure'),
     Input(component_id='forcing_checklist', component_property='value'),
     Input(component_id='add_forcings', component_property='value'),
+    Input(component_id='text_area', component_property='value')
 )
-def update_plot(forcings, add_forcings):
+def update_plot(forcings, add_forcings, text_input):
     fig = px.line()
     fig.update_layout(plot_bgcolor='rgb(255, 255, 255)', yaxis_zeroline=True, yaxis_zerolinecolor='gainsboro',
                       yaxis_showline=True, yaxis_linecolor='gainsboro')
@@ -258,7 +294,12 @@ def update_plot(forcings, add_forcings):
         newshape=dict(line_color='magenta'),
     )
 
+    if text_input != None:
+        fig = update_text(fig, text_input)
+
     return fig
+
+
 
 if __name__ == '__main__':
     app.run_server(debug=True, host='0.0.0.0', port=8050)
