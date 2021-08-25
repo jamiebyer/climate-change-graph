@@ -86,43 +86,18 @@ def render_content(tab):
 
 
             html.Div([
-                dcc.Markdown('''
-                        **Natural Factors**
-                        '''),
                 dcc.RadioItems(
-                    id='natural_radiobuttons',
+                    id='forcing_radiobuttons',
                     options=[
-                        {'label': 'Orbital Changes', 'value': 'OC'},
-                        {'label': 'Solar', 'value': 'S'},
-                        {'label': 'Volcanic', 'value': 'V'}
-                    ],
-                ),
-
-                dcc.Markdown('''
-                        **Human Factors**
-                        '''),
-                dcc.RadioItems(
-                    id='human_radiobuttons',
-                    options=[
-                        {'label': 'Land Use', 'value': 'LU'},
-                        {'label': 'Ozone', 'value': 'O'},
                         {'label': 'Aerosols', 'value': 'A'},
                         {'label': 'Greenhouse Gases', 'value': 'GG'},
+                        {'label': 'Land Use', 'value': 'LU'},
+                        {'label': 'Orbital Changes', 'value': 'OC'},
+                        {'label': 'Ozone', 'value': 'O'},
+                        {'label': 'Solar', 'value': 'S'},
+                        {'label': 'Volcanic', 'value': 'V'},
                     ],
                 ),
-
-                dcc.Markdown('''
-                        **All Factors**
-                        '''),
-                dcc.RadioItems(
-                    id='all_radiobuttons',
-                    options=[
-                        {'label': 'Natural', 'value': 'N'},
-                        {'label': 'Human', 'value': 'H'},
-                        {'label': 'All Forcings', 'value': 'ALL'}
-                    ],
-                ),
-
             ], style={'width': '20%', 'display': 'inline-block', 'vertical-align': 'middle'}),
 
 
@@ -153,45 +128,19 @@ def render_content(tab):
             ], style={'width': '80%', 'display': 'inline-block', 'vertical-align': 'middle'}),
 
             html.Div([
-                dcc.Markdown('''
-                        **Natural Factors**
-                        '''),
                 dcc.Checklist(
-                    id='natural_checklist',
+                    id='forcing_checklist',
                     options=[
-                        {'label': 'Orbital Changes', 'value': 'OC'},
-                        {'label': 'Solar', 'value': 'S'},
-                        {'label': 'Volcanic', 'value': 'V'}
-                    ],
-                    value=[],
-                ),
-                dcc.Markdown('''
-                        **Human Factors**
-                        '''),
-                dcc.Checklist(
-                    id='human_checklist',
-                    options=[
-                        {'label': 'Land Use', 'value': 'LU'},
-                        {'label': 'Ozone', 'value': 'O'},
                         {'label': 'Aerosols', 'value': 'A'},
                         {'label': 'Greenhouse Gases', 'value': 'GG'},
+                        {'label': 'Land Use', 'value': 'LU'},
+                        {'label': 'Orbital Changes', 'value': 'OC'},
+                        {'label': 'Ozone', 'value': 'O'},
+                        {'label': 'Solar', 'value': 'S'},
+                        {'label': 'Volcanic', 'value': 'V'},
                     ],
                     value=[],
                 ),
-
-                dcc.Markdown('''
-                        **All Factors**
-                        '''),
-                dcc.Checklist(
-                    id='all_checklist',
-                    options=[
-                        {'label': 'Natural', 'value': 'N'},
-                        {'label': 'Human', 'value': 'H'},
-                        {'label': 'All Forcings', 'value': 'ALL'}
-                    ],
-                    value=[],
-                ),
-
             ], style={'width': '20%', 'display': 'inline-block', 'vertical-align': 'middle'}),
 
         ])
@@ -201,19 +150,13 @@ def render_content(tab):
 
 @app.callback(
     Output(component_id='description', component_property='children'),
-    Input(component_id='natural_radiobuttons', component_property='value'),
-    Input(component_id='human_radiobuttons', component_property='value'),
-    Input(component_id='all_radiobuttons', component_property='value'),
+    Input(component_id='forcing_radiobuttons', component_property='value'),
 )
-def update_description(natural, human, all):
+def update_description(forcing):
     output = []
 
-    if natural is not None:
-        output += descriptions[natural]
-    if human is not None:
-        output += descriptions[human]
-    if all is not None:
-        output += descriptions[all]
+    if forcing is not None:
+        output += descriptions[forcing]
 
     return output
 
@@ -245,12 +188,10 @@ def update_factors(fig, factors):
 
 @app.callback(
     Output(component_id='learn_graph', component_property='figure'),
-    Input(component_id='natural_radiobuttons', component_property='value'),
-    Input(component_id='human_radiobuttons', component_property='value'),
-    Input(component_id='all_radiobuttons', component_property='value'),
+    Input(component_id='forcing_radiobuttons', component_property='value'),
 )
-def update_plot(natural_radiobuttons, human_radiobuttons, all_radiobuttons):
-    factors = [natural_radiobuttons] + [human_radiobuttons] + [all_radiobuttons]
+def update_plot(forcing):
+    factors = [forcing]
 
     fig = px.line()
     fig.update_layout(plot_bgcolor='rgb(255, 255, 255)', yaxis_zeroline=True, yaxis_zerolinecolor='gainsboro', yaxis_showline=True, yaxis_linecolor='gainsboro')
@@ -269,12 +210,10 @@ def update_plot(natural_radiobuttons, human_radiobuttons, all_radiobuttons):
 
 @app.callback(
     Output(component_id='explore_graph', component_property='figure'),
-    Input(component_id='natural_checklist', component_property='value'),
-    Input(component_id='human_checklist', component_property='value'),
-    Input(component_id='all_checklist', component_property='value'),
+    Input(component_id='forcing_checklist', component_property='value'),
 )
-def update_plot(natural_checklist, human_checklist, all_checklist):
-    factors = natural_checklist + human_checklist + all_checklist
+def update_plot(forcings):
+    factors = forcings
 
     #fig = px.line(land_ocean_data, x='Year', y='Annual_Mean', color_discrete_sequence=['black'])
     fig = px.line()
