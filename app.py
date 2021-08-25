@@ -74,6 +74,9 @@ def render_content(tab):
                         'displayModeBar': True,
                         'doubleClick': 'reset',  # 'reset', 'autosize' or 'reset+autosize', False
                     },
+                    animate=True,
+                    #animation_options={'frame': {'duration': 1000}}
+                    animation_options={'frame': {'redraw':True}}
                 ),
             ], style={'width': '80%', 'display': 'inline-block', 'vertical-align': 'middle'}),
 
@@ -164,7 +167,7 @@ def update_description(forcing):
 
     return output
 
-def update_factors(fig, factors):
+def update_factors(fig, factors, graph_type):
     #colors: https://www.w3schools.com/cssref/css_colors.asp
     #error bars: https://plotly.com/python/continuous-error-bars/
     colour_name = ['DeepSkyBlue', 'Orange', 'Red', 'Sienna', 'CadetBlue', 'MediumSlateBlue', 'SeaGreen', 'GreenYellow', 'DarkGrey', 'Purple']
@@ -187,6 +190,11 @@ def update_factors(fig, factors):
             ])
             fig.add_traces(new_fig_error.data)
             fig.add_trace(new_fig.data[0])
+
+
+
+
+
     return fig
 
 
@@ -224,7 +232,7 @@ def update_plot(forcing):
 
     fig = px.line()
     fig.update_layout(plot_bgcolor='rgb(255, 255, 255)', yaxis_zeroline=True, yaxis_zerolinecolor='gainsboro', yaxis_showline=True, yaxis_linecolor='gainsboro')
-    fig = update_factors(fig, factors)
+    fig = update_factors(fig, factors, 'learn')
     figTemp = px.line(land_ocean_data, x='Year', y='Annual_Mean', color_discrete_sequence=['black'])
     fig.add_trace(figTemp.data[0])
     fig.update_yaxes(title='Temperature (C)', range=[-1.2, 1.2])
@@ -276,7 +284,7 @@ def update_plot(forcings, add_forcings, text_input):
                       yaxis_showline=True, yaxis_linecolor='gainsboro')
 
     if add_forcings != ['add_forcings']:
-        fig = update_factors(fig, forcings)
+        fig = update_factors(fig, forcings, 'explore')
     elif len(forcings) > 0:
         fig = add_factors(fig, forcings)
     figTemp = px.line(land_ocean_data, x='Year', y='Annual_Mean', color_discrete_sequence=['black'])
