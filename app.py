@@ -189,6 +189,7 @@ def update_learn_factors(fig, factors):
             fig.add_traces(new_fig_error.data)
             fig.add_trace(new_fig.data[0])
 
+            #animation from: https://stackoverflow.com/questions/62231223/animated-lineplot-with-python-plotly
             fig.update(frames=[
                 go.Frame(
                     data=[
