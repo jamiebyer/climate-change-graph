@@ -203,7 +203,7 @@ def update_learn_factors(fig, factors):
                         type='buttons',
                         buttons=[dict(label="Play",
                                  method="animate",
-                                 args=[None, {"frame": {"duration": 0}}])
+                                 args=[None, {"frame": {"duration": 0.001}}])
                         ])])
 
             #fig.write_html(auto_play=True)
