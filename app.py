@@ -116,6 +116,9 @@ def render_content(tab):
             ], style={'width': '80%', 'display': 'inline-block', 'vertical-align': 'middle'}),
 
             html.Div([
+                dcc.Markdown(
+                    '''**Contributing Factors**'''
+                ),
                 dcc.Checklist(
                     id='forcing_checklist',
                     options=[
@@ -133,10 +136,11 @@ def render_content(tab):
                 dcc.Checklist(
                     id='add_forcings',
                     options=[
-                        {'label': 'Add Forcings', 'value': 'add_forcings'},
+                        {'label': 'Sum selected factors', 'value': 'add_forcings'},
                     ],
                     value=[],
-                    style={'font-weight': 'bold', 'margin-top': '50px'}
+                    style={'margin-top': '50px'}
+                    #style={'font-weight': 'bold', 'margin-top': '50px'}
                 ),
             ], style={'width': '20%', 'display': 'inline-block', 'vertical-align': 'middle'}),
 
@@ -276,7 +280,7 @@ def update_plot(forcing):
     fig = update_learn_factors(fig, factors)
     figTemp = px.line(land_ocean_data, x='Year', y='Annual_Mean', color_discrete_sequence=['black'])
     fig.add_trace(figTemp.data[0])
-    fig.update_yaxes(title='Temperature (C)', range=[-1.2, 1.2])
+    fig.update_yaxes(title='Temperature  Anomaly (C)', range=[-1.2, 1.2])
 
     #annotation
     fig.add_annotation(x=2005, y=0.938064516129032,
@@ -330,21 +334,22 @@ def update_plot(forcings, add_forcings, text_input):
         fig = add_factors(fig, forcings)
     figTemp = px.line(land_ocean_data, x='Year', y='Annual_Mean', color_discrete_sequence=['black'])
     fig.add_trace(figTemp.data[0])
-    fig.update_yaxes(title='Temperature (C)', range=[-1.2, 1.2])
-
-    #annotation
-    fig.add_annotation(x=2005, y=0.938064516129032,
-                       text="<b>observed<br>temperature</b>",
-                       showarrow=True,
-                       arrowhead=1)
+    fig.update_yaxes(title='Temperature Anomaly (C)', range=[-1.2, 1.2])
 
     fig.update_layout(
         #dragmode='drawline',
         newshape=dict(line_color='magenta'),
+        height=500
     )
 
     if text_input != None:
         fig = update_text(fig, text_input)
+
+    # annotation
+    fig.add_annotation(x=2005, y=0.938064516129032,
+                       text="<b>observed<br>temperature</b>",
+                       showarrow=True,
+                       arrowhead=1)
 
     return fig
 
