@@ -83,13 +83,15 @@ def render_content(tab):
                 dcc.RadioItems(
                     id='forcing_radiobuttons',
                     options=[
+                        {'label': 'Volcanic', 'value': 'V'},
+                        {'label': 'Ozone', 'value': 'O'},
+                        {'label': 'Orbital Changes', 'value': 'OC'},
+                        {'label': 'Solar', 'value': 'S'},
+                        {'label': 'Land Use', 'value': 'LU'},
                         {'label': 'Aerosols', 'value': 'A'},
                         {'label': 'Greenhouse Gases', 'value': 'GG'},
-                        {'label': 'Land Use', 'value': 'LU'},
-                        {'label': 'Orbital Changes', 'value': 'OC'},
-                        {'label': 'Ozone', 'value': 'O'},
-                        {'label': 'Solar', 'value': 'S'},
-                        {'label': 'Volcanic', 'value': 'V'},
+                        #A, GG, LU, OC, O, S, V
+                        #V, O, OC, S, LU, A, GG
                     ],
                 ),
             ], style={'width': '20%', 'display': 'inline-block', 'vertical-align': 'middle'}),
@@ -122,13 +124,15 @@ def render_content(tab):
                 dcc.Checklist(
                     id='forcing_checklist',
                     options=[
+                        {'label': 'Volcanic', 'value': 'V'},
+                        {'label': 'Ozone', 'value': 'O'},
+                        {'label': 'Orbital Changes', 'value': 'OC'},
+                        {'label': 'Solar', 'value': 'S'},
+                        {'label': 'Land Use', 'value': 'LU'},
                         {'label': 'Aerosols', 'value': 'A'},
                         {'label': 'Greenhouse Gases', 'value': 'GG'},
-                        {'label': 'Land Use', 'value': 'LU'},
-                        {'label': 'Orbital Changes', 'value': 'OC'},
-                        {'label': 'Ozone', 'value': 'O'},
-                        {'label': 'Solar', 'value': 'S'},
-                        {'label': 'Volcanic', 'value': 'V'},
+                        # A, GG, LU, OC, O, S, V
+                        # V, O, OC, S, LU, A, GG
                     ],
                     value=[],
                 ),
@@ -176,11 +180,14 @@ def update_learn_factors(fig, factors):
     colour_rgb = ['rgba(0, 191, 255, 0.2)', 'rgba(255, 165, 0, 0.2)', 'rgba(255, 0, 0, 0.2)', 'rgba(136, 45, 23, 0.2)', 'rgba(95, 158, 160, 0.2)',
                   'rgba(123, 104, 238, 0.2)', 'rgba(46, 139, 87, 0.2)', 'rgba(173, 255, 47, 0.2)', 'rgba(169, 169, 169, 0.2)', 'rgba(128, 0, 128, 0.2)']
     name = ['OC', 'S', 'V', 'LU', 'O', 'A', 'GG', 'N', 'H', 'ALL']
+    label_name = ['Orbital Changes', 'Solar', 'Volcanic', 'Land Use', 'Ozone', 'Aerosols', 'Greenhouse Gases',
+                  'Natural Forcings', 'Human Forcings', 'All Forcings']
     df_name = ['Orbital changes', 'Solar', 'Volcanic', 'Land use', 'Ozone', 'Anthropogenic tropospheric aerosol', 'Greenhouse gases',
                'Natural', 'Human', 'All forcings']
     for i in range(10):
         if name[i] in factors:
             new_fig = px.line(climate_forcings_data, x='Year', y=df_name[i], color_discrete_sequence=[colour_name[i]])
+            new_fig.update_traces(hovertemplate="Year: %{x}<br>" + label_name[i] + ": %{y:.3f}")
             new_fig_error = go.Figure([
                 go.Scatter(name='Upper Bound', x=climate_forcings_data['Year'],
                            y=climate_forcings_data[df_name[i]] + climate_forcings_data['Error'],
@@ -190,6 +197,7 @@ def update_learn_factors(fig, factors):
                            marker=dict(color="#444"), line=dict(width=0), mode='lines', fillcolor=colour_rgb[i],
                            fill='tonexty', showlegend=False)
             ])
+            new_fig_error.update_traces(hovertemplate="Year: %{x}<br>" + label_name[i] + ": %{y:.3f}")
             fig.add_traces(new_fig_error.data)
             fig.add_trace(new_fig.data[0])
 
@@ -205,11 +213,24 @@ def update_learn_factors(fig, factors):
 
             fig.update_layout(
                 updatemenus=[dict(
-                        type='buttons',
+                        type= 'buttons',
+                        direction= 'right',
+                        pad={"r": 20, "l": 50},
+                        xanchor="left",
+                        yanchor="top",
                         buttons=[dict(label="Play",
                                  method="animate",
-                                 args=[None, {"frame": {"duration": 0.001}}])
-                        ])])
+                                 args=[None, dict(frame= {"duration": 1, "redraw": False},
+                                       fromcurrent= True, transition= {"duration": 300,
+                                                                              "easing": "quadratic-in-out"})]),
+                                 dict(label="Pause",
+                                  method="animate",
+                                  args=[[None], dict(frame= {"duration": 0, "redraw": False},
+                                        mode= "immediate",
+                                        transition= {"duration": 0})])
+                                 ])])
+
+
 
             #fig.write_html(auto_play=True)
 
@@ -224,11 +245,14 @@ def update_explore_factors(fig, factors):
     colour_rgb = ['rgba(0, 191, 255, 0.2)', 'rgba(255, 165, 0, 0.2)', 'rgba(255, 0, 0, 0.2)', 'rgba(136, 45, 23, 0.2)', 'rgba(95, 158, 160, 0.2)',
                   'rgba(123, 104, 238, 0.2)', 'rgba(46, 139, 87, 0.2)', 'rgba(173, 255, 47, 0.2)', 'rgba(169, 169, 169, 0.2)', 'rgba(128, 0, 128, 0.2)']
     name = ['OC', 'S', 'V', 'LU', 'O', 'A', 'GG', 'N', 'H', 'ALL']
+    label_name = ['Orbital Changes', 'Solar', 'Volcanic', 'Land Use', 'Ozone', 'Aerosols', 'Greenhouse Gases',
+                  'Natural Forcings', 'Human Forcings', 'All Forcings']
     df_name = ['Orbital changes', 'Solar', 'Volcanic', 'Land use', 'Ozone', 'Anthropogenic tropospheric aerosol', 'Greenhouse gases',
                'Natural', 'Human', 'All forcings']
     for i in range(10):
         if name[i] in factors:
             new_fig = px.line(climate_forcings_data, x='Year', y=df_name[i], color_discrete_sequence=[colour_name[i]])
+            new_fig.update_traces(hovertemplate="Year: %{x}<br>" + label_name[i] + ": %{y:.3f}")
             new_fig_error = go.Figure([
                 go.Scatter(name='Upper Bound', x=climate_forcings_data['Year'],
                            y=climate_forcings_data[df_name[i]] + climate_forcings_data['Error'],
@@ -238,6 +262,7 @@ def update_explore_factors(fig, factors):
                            marker=dict(color="#444"), line=dict(width=0), mode='lines', fillcolor=colour_rgb[i],
                            fill='tonexty', showlegend=False)
             ])
+            new_fig_error.update_traces(hovertemplate="Year: %{x}<br>" + label_name[i] + ": %{y:.3f}")
             fig.add_traces(new_fig_error.data)
             fig.add_trace(new_fig.data[0])
 
@@ -254,6 +279,7 @@ def add_factors(fig, factors):
             y += climate_forcings_data[df_name[i]]
 
     new_fig = px.line(x=climate_forcings_data['Year'], y=y, color_discrete_sequence=['purple'])
+    new_fig.update_traces(hovertemplate="Year: %{x}<br> Summed Factors: %{y:.3f}")
     new_fig_error = go.Figure([
         go.Scatter(name='Upper Bound', x=climate_forcings_data['Year'],
                    y=y + climate_forcings_data['Error'],
@@ -263,6 +289,7 @@ def add_factors(fig, factors):
                    marker=dict(color="#444"), line=dict(width=0), mode='lines', fillcolor='rgba(128, 0, 128, 0.2)',
                    fill='tonexty', showlegend=False)
     ])
+    new_fig_error.update_traces(hovertemplate="Year: %{x}<br> Summed Factors: %{y:.3f}")
     fig.add_traces(new_fig_error.data)
     fig.add_trace(new_fig.data[0])
     return fig
@@ -279,8 +306,9 @@ def update_plot(forcing):
     fig.update_layout(plot_bgcolor='rgb(255, 255, 255)', yaxis_zeroline=True, yaxis_zerolinecolor='gainsboro', yaxis_showline=True, yaxis_linecolor='gainsboro')
     fig = update_learn_factors(fig, factors)
     figTemp = px.line(land_ocean_data, x='Year', y='Annual_Mean', color_discrete_sequence=['black'])
+    figTemp.update_traces(hovertemplate="Year: %{x}<br>Annual Mean: %{y:.3f}")
     fig.add_trace(figTemp.data[0])
-    fig.update_yaxes(title='Temperature  Anomaly (C)', range=[-1.2, 1.2])
+    fig.update_yaxes(title='Temperature  Anomaly (ºC)', range=[-1.2, 1.2])
 
     #annotation
     fig.add_annotation(x=2005, y=0.938064516129032,
