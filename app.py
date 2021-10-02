@@ -75,7 +75,7 @@ def render_content(tab):
                         'displayModeBar': True,
                         'doubleClick': 'reset',  # 'reset', 'autosize' or 'reset+autosize', False
                     },
-                    animate=True,
+                    #animate=True,
                 ),
             ], style={'width': '80%', 'display': 'inline-block', 'vertical-align': 'middle'}),
 
@@ -207,6 +207,7 @@ def update_learn_factors(fig, factors, units):
         data = climate_forcings_data_c
     elif units == 'F':
         data = climate_forcings_data_f
+
     #colors: https://www.w3schools.com/cssref/css_colors.asp
     #error bars: https://plotly.com/python/continuous-error-bars/
     colour_name = ['DeepSkyBlue', 'Orange', 'Red', 'Sienna', 'CadetBlue', 'MediumSlateBlue', 'SeaGreen', 'GreenYellow', 'DarkGrey', 'Purple']
@@ -254,8 +255,7 @@ def update_learn_factors(fig, factors, units):
                         buttons=[dict(label="Play",
                                  method="animate",
                                  args=[None, dict(frame= {"duration": 1, "redraw": False},
-                                       fromcurrent= True, transition= {"duration": 300,
-                                                                              "easing": "quadratic-in-out"})]),
+                                       fromcurrent= True, transition= {"duration": 300})]),
                                  dict(label="Pause",
                                   method="animate",
                                   args=[[None], dict(frame= {"duration": 0, "redraw": False},
