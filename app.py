@@ -28,10 +28,11 @@ introduction_markdown = introduction.read()
 with open('descriptions.json') as f:
     descriptions = json.load(f)
 
-land_ocean_data = pd.read_csv("./land_ocean_filtered.csv")
-climate_forcings_data = pd.read_csv("./climate_forcings_filtered.csv")
+land_ocean_data_c = pd.read_csv("./land_ocean_c_filtered.csv")
+land_ocean_data_f = pd.read_csv("./land_ocean_f_filtered.csv")
+climate_forcings_data_c = pd.read_csv("./climate_forcings_c_filtered.csv")
+climate_forcings_data_f = pd.read_csv("./climate_forcings_f_filtered.csv")
 #averages_data = pd.read_csv("./averages.csv")
-
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -80,6 +81,9 @@ def render_content(tab):
 
 
             html.Div([
+                dcc.Markdown(
+                    '''**Contributing Factors**'''
+                ),
                 dcc.RadioItems(
                     id='forcing_radiobuttons',
                     options=[
@@ -93,6 +97,19 @@ def render_content(tab):
                         #A, GG, LU, OC, O, S, V
                         #V, O, OC, S, LU, A, GG
                     ],
+                    style={'margin-bottom': '50px'}
+                ),
+                dcc.Markdown(
+                    '''**Units**'''
+                ),
+                dcc.RadioItems(
+                    id='units',
+                    options=[
+                        {'label': 'Celsius', 'value': 'C'},
+                        {'label': 'Fahrenheit', 'value': 'F'},
+                    ],
+                    value='C',
+                    # style={'font-weight': 'bold', 'margin-top': '50px'}
                 ),
             ], style={'width': '20%', 'display': 'inline-block', 'vertical-align': 'middle'}),
 
@@ -143,8 +160,20 @@ def render_content(tab):
                         {'label': 'Sum selected factors', 'value': 'add_forcings'},
                     ],
                     value=[],
-                    style={'margin-top': '50px'}
+                    style={'margin-top': '30px', 'margin-bottom': '30px'}
                     #style={'font-weight': 'bold', 'margin-top': '50px'}
+                ),
+                dcc.Markdown(
+                    '''**Units**'''
+                ),
+                dcc.RadioItems(
+                    id='units',
+                    options=[
+                        {'label': 'Celsius', 'value': 'C'},
+                        {'label': 'Fahrenheit', 'value': 'F'},
+                    ],
+                    value='C',
+                    # style={'font-weight': 'bold', 'margin-top': '50px'}
                 ),
             ], style={'width': '20%', 'display': 'inline-block', 'vertical-align': 'middle'}),
 
@@ -173,7 +202,11 @@ def update_description(forcing):
 
     return output
 
-def update_learn_factors(fig, factors):
+def update_learn_factors(fig, factors, units):
+    if units == 'C':
+        data = climate_forcings_data_c
+    elif units == 'F':
+        data = climate_forcings_data_f
     #colors: https://www.w3schools.com/cssref/css_colors.asp
     #error bars: https://plotly.com/python/continuous-error-bars/
     colour_name = ['DeepSkyBlue', 'Orange', 'Red', 'Sienna', 'CadetBlue', 'MediumSlateBlue', 'SeaGreen', 'GreenYellow', 'DarkGrey', 'Purple']
@@ -186,14 +219,14 @@ def update_learn_factors(fig, factors):
                'Natural', 'Human', 'All forcings']
     for i in range(10):
         if name[i] in factors:
-            new_fig = px.line(climate_forcings_data, x='Year', y=df_name[i], color_discrete_sequence=[colour_name[i]])
+            new_fig = px.line(data, x='Year', y=df_name[i], color_discrete_sequence=[colour_name[i]])
             new_fig.update_traces(hovertemplate="Year: %{x}<br>" + label_name[i] + ": %{y:.3f}")
             new_fig_error = go.Figure([
-                go.Scatter(name='Upper Bound', x=climate_forcings_data['Year'],
-                           y=climate_forcings_data[df_name[i]] + climate_forcings_data['Error'],
+                go.Scatter(name='Upper Bound', x=data['Year'],
+                           y=data[df_name[i]] + data['Error'],
                            mode='lines', marker=dict(color="#444"), line=dict(width=0), showlegend=False),
-                go.Scatter(name='Lower Bound', x=climate_forcings_data['Year'],
-                           y=climate_forcings_data[df_name[i]] - climate_forcings_data['Error'],
+                go.Scatter(name='Lower Bound', x=data['Year'],
+                           y=data[df_name[i]] - data['Error'],
                            marker=dict(color="#444"), line=dict(width=0), mode='lines', fillcolor=colour_rgb[i],
                            fill='tonexty', showlegend=False)
             ])
@@ -205,11 +238,11 @@ def update_learn_factors(fig, factors):
             fig.update(frames=[
                 go.Frame(
                     data=[
-                        go.Scatter(x=climate_forcings_data['Year'][:k], y=(climate_forcings_data[df_name[i]] + climate_forcings_data['Error'])[:k]),
-                        go.Scatter(x=climate_forcings_data['Year'][:k], y=(climate_forcings_data[df_name[i]] - climate_forcings_data['Error'])[:k]),
-                        go.Scatter(x=climate_forcings_data['Year'][:k], y=climate_forcings_data[df_name[i]][:k])]
+                        go.Scatter(x=data['Year'][:k], y=(data[df_name[i]] + data['Error'])[:k]),
+                        go.Scatter(x=data['Year'][:k], y=(data[df_name[i]] - data['Error'])[:k]),
+                        go.Scatter(x=data['Year'][:k], y=data[df_name[i]][:k])]
                 )
-                for k in range(1, len(climate_forcings_data) + 1)])
+                for k in range(1, len(data) + 1)])
 
             fig.update_layout(
                 updatemenus=[dict(
@@ -230,15 +263,17 @@ def update_learn_factors(fig, factors):
                                         transition= {"duration": 0})])
                                  ])])
 
-
-
             #fig.write_html(auto_play=True)
 
 
     return fig
 
 
-def update_explore_factors(fig, factors):
+def update_explore_factors(fig, factors, units):
+    if units == 'C':
+        data = climate_forcings_data_c
+    elif units == 'F':
+        data = climate_forcings_data_f
     #colors: https://www.w3schools.com/cssref/css_colors.asp
     #error bars: https://plotly.com/python/continuous-error-bars/
     colour_name = ['DeepSkyBlue', 'Orange', 'Red', 'Sienna', 'CadetBlue', 'MediumSlateBlue', 'SeaGreen', 'GreenYellow', 'DarkGrey', 'Purple']
@@ -251,14 +286,14 @@ def update_explore_factors(fig, factors):
                'Natural', 'Human', 'All forcings']
     for i in range(10):
         if name[i] in factors:
-            new_fig = px.line(climate_forcings_data, x='Year', y=df_name[i], color_discrete_sequence=[colour_name[i]])
+            new_fig = px.line(data, x='Year', y=df_name[i], color_discrete_sequence=[colour_name[i]])
             new_fig.update_traces(hovertemplate="Year: %{x}<br>" + label_name[i] + ": %{y:.3f}")
             new_fig_error = go.Figure([
-                go.Scatter(name='Upper Bound', x=climate_forcings_data['Year'],
-                           y=climate_forcings_data[df_name[i]] + climate_forcings_data['Error'],
+                go.Scatter(name='Upper Bound', x=data['Year'],
+                           y=data[df_name[i]] + data['Error'],
                            mode='lines', marker=dict(color="#444"), line=dict(width=0), showlegend=False),
-                go.Scatter(name='Lower Bound', x=climate_forcings_data['Year'],
-                           y=climate_forcings_data[df_name[i]] - climate_forcings_data['Error'],
+                go.Scatter(name='Lower Bound', x=data['Year'],
+                           y=data[df_name[i]] - data['Error'],
                            marker=dict(color="#444"), line=dict(width=0), mode='lines', fillcolor=colour_rgb[i],
                            fill='tonexty', showlegend=False)
             ])
@@ -268,24 +303,29 @@ def update_explore_factors(fig, factors):
 
     return fig
 
-def add_factors(fig, factors):
-    y = [0]*len(climate_forcings_data)
+def add_factors(fig, factors, units):
+    if units == 'C':
+        data = climate_forcings_data_c
+    elif units == 'F':
+        data = climate_forcings_data_f
+
+    y = [0]*len(data)
 
     name = ['OC', 'S', 'V', 'LU', 'O', 'A', 'GG', 'N', 'H', 'ALL']
     df_name = ['Orbital changes', 'Solar', 'Volcanic', 'Land use', 'Ozone', 'Anthropogenic tropospheric aerosol', 'Greenhouse gases',
                'Natural', 'Human', 'All forcings']
     for i in range(10):
         if name[i] in factors:
-            y += climate_forcings_data[df_name[i]]
+            y += data[df_name[i]]
 
-    new_fig = px.line(x=climate_forcings_data['Year'], y=y, color_discrete_sequence=['purple'])
+    new_fig = px.line(x=data['Year'], y=y, color_discrete_sequence=['purple'])
     new_fig.update_traces(hovertemplate="Year: %{x}<br> Summed Factors: %{y:.3f}")
     new_fig_error = go.Figure([
-        go.Scatter(name='Upper Bound', x=climate_forcings_data['Year'],
-                   y=y + climate_forcings_data['Error'],
+        go.Scatter(name='Upper Bound', x=data['Year'],
+                   y=y + data['Error'],
                    mode='lines', marker=dict(color="#444"), line=dict(width=0), showlegend=False),
-        go.Scatter(name='Lower Bound', x=climate_forcings_data['Year'],
-                   y=y - climate_forcings_data['Error'],
+        go.Scatter(name='Lower Bound', x=data['Year'],
+                   y=y - data['Error'],
                    marker=dict(color="#444"), line=dict(width=0), mode='lines', fillcolor='rgba(128, 0, 128, 0.2)',
                    fill='tonexty', showlegend=False)
     ])
@@ -298,23 +338,37 @@ def add_factors(fig, factors):
 @app.callback(
     Output(component_id='learn_graph', component_property='figure'),
     Input(component_id='forcing_radiobuttons', component_property='value'),
+    Input(component_id='units', component_property='value'),
 )
-def update_plot(forcing):
+def update_plot(forcing, units):
+    if units == 'C':
+        data = land_ocean_data_c
+    if units == 'F':
+        data = land_ocean_data_f
+
     factors = [forcing]
 
     fig = px.line()
     fig.update_layout(plot_bgcolor='rgb(255, 255, 255)', yaxis_zeroline=True, yaxis_zerolinecolor='gainsboro', yaxis_showline=True, yaxis_linecolor='gainsboro')
-    fig = update_learn_factors(fig, factors)
-    figTemp = px.line(land_ocean_data, x='Year', y='Annual_Mean', color_discrete_sequence=['black'])
+    fig = update_learn_factors(fig, factors, units)
+    figTemp = px.line(data, x='Year', y='Annual_Mean', color_discrete_sequence=['black'])
     figTemp.update_traces(hovertemplate="Year: %{x}<br>Annual Mean: %{y:.3f}")
     fig.add_trace(figTemp.data[0])
-    fig.update_yaxes(title='Temperature  Anomaly (ºC)', range=[-1.2, 1.2])
+    if units == 'C':
+        fig.update_yaxes(title='Temperature  Anomaly (ºC)', range=[-1.2, 1.2])
+        # annotation
+        fig.add_annotation(x=2005, y=0.938064516129032,
+                           text="<b>observed<br>temperature</b>",
+                           showarrow=True,
+                           arrowhead=1)
+    elif units == 'F':
+        fig.update_yaxes(title='Temperature  Anomaly (ºF)', range=[-1.2*1.8, 1.2*1.8])
+        # annotation
+        fig.add_annotation(x=2005, y=0.938064516129032*1.8,
+                           text="<b>observed<br>temperature</b>",
+                           showarrow=True,
+                           arrowhead=1)
 
-    #annotation
-    fig.add_annotation(x=2005, y=0.938064516129032,
-                       text="<b>observed<br>temperature</b>",
-                       showarrow=True,
-                       arrowhead=1)
 
     return fig
 
@@ -349,20 +403,43 @@ def update_text(fig, text_input):
     Output(component_id='explore_graph', component_property='figure'),
     Input(component_id='forcing_checklist', component_property='value'),
     Input(component_id='add_forcings', component_property='value'),
-    Input(component_id='text_area', component_property='value')
+    Input(component_id='text_area', component_property='value'),
+    Input(component_id='units', component_property='value')
 )
-def update_plot(forcings, add_forcings, text_input):
+def update_plot(forcings, add_forcings, text_input, units):
+    if units == 'C':
+        data = land_ocean_data_c
+    if units == 'F':
+        data = land_ocean_data_f
+
     fig = px.line()
     fig.update_layout(plot_bgcolor='rgb(255, 255, 255)', yaxis_zeroline=True, yaxis_zerolinecolor='gainsboro',
                       yaxis_showline=True, yaxis_linecolor='gainsboro')
 
     if add_forcings != ['add_forcings']:
-        fig = update_explore_factors(fig, forcings)
+        fig = update_explore_factors(fig, forcings, units)
     elif len(forcings) > 0:
-        fig = add_factors(fig, forcings)
-    figTemp = px.line(land_ocean_data, x='Year', y='Annual_Mean', color_discrete_sequence=['black'])
+        fig = add_factors(fig, forcings, units)
+    figTemp = px.line(data, x='Year', y='Annual_Mean', color_discrete_sequence=['black'])
     fig.add_trace(figTemp.data[0])
-    fig.update_yaxes(title='Temperature Anomaly (C)', range=[-1.2, 1.2])
+
+    if text_input != None:
+        fig = update_text(fig, text_input)
+
+    if units == 'C':
+        fig.update_yaxes(title='Temperature Anomaly (ºC)', range=[-1.2, 1.2])
+        # annotation
+        fig.add_annotation(x=2005, y=0.938064516129032,
+                           text="<b>observed<br>temperature</b>",
+                           showarrow=True,
+                           arrowhead=1)
+    elif units == 'F':
+        fig.update_yaxes(title='Temperature Anomaly (ºF)', range=[-1.2*1.8, 1.2*1.8])
+        # annotation
+        fig.add_annotation(x=2005, y=0.938064516129032*1.8,
+                           text="<b>observed<br>temperature</b>",
+                           showarrow=True,
+                           arrowhead=1)
 
     fig.update_layout(
         #dragmode='drawline',
@@ -370,14 +447,6 @@ def update_plot(forcings, add_forcings, text_input):
         height=500
     )
 
-    if text_input != None:
-        fig = update_text(fig, text_input)
-
-    # annotation
-    fig.add_annotation(x=2005, y=0.938064516129032,
-                       text="<b>observed<br>temperature</b>",
-                       showarrow=True,
-                       arrowhead=1)
 
     return fig
 
