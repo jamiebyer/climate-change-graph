@@ -1,10 +1,25 @@
 ## Factors Contributing to Climate Change
 -----
 
-The black "observed" line is the GISS global land and ocean temperature record, which can be found [here](https://data.giss.nasa.gov/gistemp/graphs_v3/). It starts in 1880.  
+The black "observed" line is the GISS global land and ocean temperature record,
+which can be found [here](https://data.giss.nasa.gov/gistemp/graphs_v3/). It
+starts in 1880.
 
-The colored temperature lines are the modeled estimates that each climate factor contributes to the overall temperature. Each factor was simulated five times, with different initial conditions; each trace here shows the average of five runs. GISS researchers laid out their historical simulations in detail last year in this [article](https://pubs.giss.nasa.gov/abs/mi08910y.html).
+The colored temperature anomaly lines are the modeled estimates that each
+climate factor contributes to the overall change in global temperature. Each
+factor was simulated five times, with different initial conditions; each trace
+here shows the average of five runs. GISS researchers laid out their historical
+simulations in detail last year in this [article](https://pubs.giss.nasa.gov/
+abs/mi08910y.html).
 
-All the lines on the plot show the variance from the 1880-1910 average of the parameter.
+Variance: All the lines on the plot show the variance from the 1880-1910
+average of the parameter.
 
-The graph and writeup is from the [Bloomberg Climate Change graph](https://www.bloomberg.com/graphics/2015-whats-warming-the-world/).
+The graph and writeup is from the [Bloomberg Climate Change graph](https://www.
+bloomberg.com/graphics/2015-whats-warming-the-world/).
+
+**Note - annotate images and save**: The "Explore" graph includes the option to
+annotate using lines or circles. Use the "Draw Line" or "Draw Circle" buttons
+visible between tab labels and the graph itself. Also text entered in the box
+below the figure will be reproduced on the image. Save the resulting annotated
+image using the "Download plot as a png" button (the little camera).
