@@ -9,14 +9,12 @@ The colored temperature anomaly lines are the modeled estimates that each
 climate factor contributes to the overall change in global temperature. Each
 factor was simulated five times, with different initial conditions; each trace
 here shows the average of five runs. GISS researchers laid out their historical
-simulations in detail last year in this [article](https://pubs.giss.nasa.gov/
-abs/mi08910y.html).
+simulations in detail last year in this [article](https://pubs.giss.nasa.gov/abs/mi08910y.html).
 
 Variance: All the lines on the plot show the variance from the 1880-1910
 average of the parameter.
 
-The graph and writeup is from the [Bloomberg Climate Change graph](https://www.
-bloomberg.com/graphics/2015-whats-warming-the-world/).
+The graph and writeup is from the [Bloomberg Climate Change graph](https://www.bloomberg.com/graphics/2015-whats-warming-the-world/).
 
 **Note - annotate images and save**: The "Explore" graph includes the option to
 annotate using lines or circles. Use the "Draw Line" or "Draw Circle" buttons
