@@ -12,8 +12,8 @@ from flask import Flask
 from os import environ
 
 import dash
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc
+from dash import html
 from dash.dependencies import Input, Output
 
 import plotly.express as px
@@ -148,8 +148,6 @@ def render_content(tab):
                         {'label': 'Land Use', 'value': 'LU'},
                         {'label': 'Aerosols', 'value': 'A'},
                         {'label': 'Greenhouse Gases', 'value': 'GG'},
-                        # A, GG, LU, OC, O, S, V
-                        # V, O, OC, S, LU, A, GG
                     ],
                     value=[],
                 ),
@@ -161,7 +159,6 @@ def render_content(tab):
                     ],
                     value=[],
                     style={'margin-top': '30px', 'margin-bottom': '30px'}
-                    #style={'font-weight': 'bold', 'margin-top': '50px'}
                 ),
                 dcc.Markdown(
                     '''**Units**'''
@@ -173,7 +170,6 @@ def render_content(tab):
                         {'label': 'Fahrenheit', 'value': 'F'},
                     ],
                     value='C',
-                    # style={'font-weight': 'bold', 'margin-top': '50px'}
                 ),
             ], style={'width': '20%', 'display': 'inline-block', 'vertical-align': 'middle'}),
 
@@ -208,6 +204,8 @@ def update_learn_factors(fig, factors, units):
     elif units == 'F':
         data = climate_forcings_data_f
 
+    xlim = fig['layout']['xaxis']['range']
+
     #colors: https://www.w3schools.com/cssref/css_colors.asp
     #error bars: https://plotly.com/python/continuous-error-bars/
     colour_name = ['DeepSkyBlue', 'Orange', 'Red', 'Sienna', 'CadetBlue', 'MediumSlateBlue', 'SeaGreen', 'GreenYellow', 'DarkGrey', 'Purple']
@@ -220,17 +218,18 @@ def update_learn_factors(fig, factors, units):
                'Natural', 'Human', 'All forcings']
     for i in range(10):
         if name[i] in factors:
-            new_fig = px.line(data, x='Year', y=df_name[i], color_discrete_sequence=[colour_name[i]])
+            new_fig = px.line(data, x=None, y=None, color_discrete_sequence=[colour_name[i]])
             new_fig.update_traces(hovertemplate="Year: %{x}<br>" + label_name[i] + ": %{y:.3f}")
             new_fig_error = go.Figure([
-                go.Scatter(name='Upper Bound', x=data['Year'],
-                           y=data[df_name[i]] + data['Error'],
+                go.Scatter(name='Upper Bound', x=[None], y=[None],
                            mode='lines', marker=dict(color="#444"), line=dict(width=0), showlegend=False),
-                go.Scatter(name='Lower Bound', x=data['Year'],
-                           y=data[df_name[i]] - data['Error'],
+                go.Scatter(name='Lower Bound', x=[None], y=[None],
                            marker=dict(color="#444"), line=dict(width=0), mode='lines', fillcolor=colour_rgb[i],
                            fill='tonexty', showlegend=False)
             ])
+            fig.update_xaxes(range=[1880, 2010])
+            fig.update_layout(showlegend=False)
+
             new_fig_error.update_traces(hovertemplate="Year: %{x}<br>" + label_name[i] + ": %{y:.3f}")
             fig.add_traces(new_fig_error.data)
             fig.add_trace(new_fig.data[0])
