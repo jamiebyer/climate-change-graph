@@ -379,6 +379,20 @@ def update_text(fig, text_input):
         else:
             text_output += chr
 
+    #character limit = 80
+    output = text_output.split('<br>')
+    new_output = ''
+    for i in output:
+        if len(i) > 80:
+            chunks = [i[j:j + 80] for j in range(0, len(i), 80)]
+            for k in chunks:
+                new_output += k + '<br>'
+        else:
+            new_output += i + '<br>'
+
+    text_output = new_output
+
+
     fig.update_layout(margin=dict(b=150))
     fig.update_layout(annotations=[
         go.layout.Annotation(
@@ -390,8 +404,8 @@ def update_text(fig, text_input):
             x=0,
             y=-0.5,
             bordercolor='black',
-            borderwidth=1,
-            borderpad=15
+            borderwidth=0,
+            borderpad=5
         )
     ])
 
