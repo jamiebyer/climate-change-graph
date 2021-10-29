@@ -1,12 +1,11 @@
 ## Factors Contributing to Climate Change
 -----
 
-The black "observed" line is the GISS global land and ocean temperature record,
+These graphs plot the global temperature <b>anomaly</b> as a function of time. The <b>temperature anomaly</b> is the difference between measured global temperature and the average of global temperature between 1880 and 1910. The black "observed" line is the GISS global land and ocean temperature anomaly record,
 which can be found [here](https://data.giss.nasa.gov/gistemp/graphs_v3/). It
 starts in 1880.
 
-The colored temperature anomaly lines are the modeled estimates that each
-climate factor contributes to the overall change in global temperature. Each
+The colored temperature anomaly lines are the modeled estimates of how much each indicated <b>factor</b> or "contributor" affects the global temperature. Each
 factor was simulated five times, with different initial conditions; each trace
 here shows the average of five runs. GISS researchers laid out their historical
 simulations in detail last year in this [article](https://pubs.giss.nasa.gov/abs/mi08910y.html).

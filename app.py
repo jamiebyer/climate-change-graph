@@ -1,12 +1,6 @@
-# -*- coding: utf-8 -*-
-
 # Run this app with `python app.py` and visit http://127.0.0.1:8050/ in your web browser.
-# documentation at https://dash.plotly.com/
-# based on ideas at "Dash App With Multiple Inputs" in https://dash.plotly.com/basic-callbacks
-# mouse-over or 'hover' behavior is based on https://dash.plotly.com/interactive-graphing
-# plotly express line parameters via https://plotly.com/python-api-reference/generated/plotly.express.line.html#plotly.express.line
-# Mapmaking code initially learned from https://plotly.com/python/mapbox-layers/.
 
+# This is the main file. It contains the Dash setup and callbacks, along with any functions needed to update the plots.
 
 from flask import Flask
 from os import environ
@@ -21,18 +15,17 @@ import plotly.graph_objects as go
 import pandas as pd
 import json
 
-#load markdown
+#load markdown file for the introduction
 introduction = open('introduction.md', 'r')
 introduction_markdown = introduction.read()
-
+#load the json with descriptions for each of the factors.
 with open('descriptions.json') as f:
     descriptions = json.load(f)
-
-land_ocean_data_c = pd.read_csv("./land_ocean_c_filtered.csv")
+#load the csvs with the climate data. There is a file for celsius data, and one for fahrenheit.
+land_ocean_data_c = pd.read_csv("./land_ocean_c_filtered.csv") #the observed temperature anomoly data
 land_ocean_data_f = pd.read_csv("./land_ocean_f_filtered.csv")
-climate_forcings_data_c = pd.read_csv("./climate_forcings_c_filtered.csv")
+climate_forcings_data_c = pd.read_csv("./climate_forcings_c_filtered.csv") #the temperature change due to forcings
 climate_forcings_data_f = pd.read_csv("./climate_forcings_f_filtered.csv")
-#averages_data = pd.read_csv("./averages.csv")
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -48,14 +41,14 @@ app.layout = html.Div([
 
     html.Div([
         dcc.Markdown(
-            children=introduction_markdown
+            children=introduction_markdown #setting the introduction from the markdown file we loaded in above.
         ),
     ], style={'width': '80%', 'display': 'inline-block', 'padding': '0 20', 'vertical-align': 'middle', 'margin-bottom': 30, 'margin-right': 50, 'margin-left': 20}),
 
     #Tabs: https://dash.plotly.com/dash-core-components/tabs
     html.Div([
         dcc.Tabs(id='tabs', value='learn', children=[
-            dcc.Tab(label='Learn', value='learn'),
+            dcc.Tab(label='Learn', value='learn'), #we have a 'learn' tab and an 'explore' tab
             dcc.Tab(label='Explore', value='explore'),
         ]),
         html.Div(id='tabs-content')
@@ -66,6 +59,7 @@ app.layout = html.Div([
 @app.callback(Output('tabs-content', 'children'),
               Input('tabs', 'value'))
 def render_content(tab):
+    # The structure of the 'learn' tab:
     if tab == 'learn':
         return html.Div([
             html.Div([
@@ -73,9 +67,9 @@ def render_content(tab):
                     id='learn_graph',
                     config={
                         'displayModeBar': True,
-                        'doubleClick': 'reset',  # 'reset', 'autosize' or 'reset+autosize', False
+                        'doubleClick': 'reset',
                     },
-                    #animate=True,
+                    #animate=True, #if we set animate to True, there's a fun effect when we change forcings
                 ),
             ], style={'width': '80%', 'display': 'inline-block', 'vertical-align': 'middle'}),
 
@@ -85,6 +79,7 @@ def render_content(tab):
                     '''**Contributing Factors**'''
                 ),
                 dcc.RadioItems(
+                    #radiobuttons for each of the forcings (https://dash.plotly.com/dash-core-components/radioitems)
                     id='forcing_radiobuttons',
                     options=[
                         {'label': 'Volcanic', 'value': 'V'},
@@ -94,8 +89,6 @@ def render_content(tab):
                         {'label': 'Land Use', 'value': 'LU'},
                         {'label': 'Aerosols', 'value': 'A'},
                         {'label': 'Greenhouse Gases', 'value': 'GG'},
-                        #A, GG, LU, OC, O, S, V
-                        #V, O, OC, S, LU, A, GG
                     ],
                     style={'margin-bottom': '50px'}
                 ),
@@ -103,24 +96,26 @@ def render_content(tab):
                     '''**Units**'''
                 ),
                 dcc.RadioItems(
+                    #radiobuttons to switch between plotting celsius and fahrenheit
                     id='units',
                     options=[
                         {'label': 'Celsius', 'value': 'C'},
                         {'label': 'Fahrenheit', 'value': 'F'},
                     ],
                     value='C',
-                    # style={'font-weight': 'bold', 'margin-top': '50px'}
                 ),
             ], style={'width': '20%', 'display': 'inline-block', 'vertical-align': 'middle'}),
 
 
             html.Div([
+                #markdown that will display the description of the forcing, from the json that was loaded in above
                 dcc.Markdown(
                     children='''**Text**''',
                     id='description',
                     style={'font-size': '14px'}, ),
             ])
         ])
+    # The structure of the 'explore' tab:
     elif tab == 'explore':
         return html.Div([
             html.Div([
@@ -129,7 +124,7 @@ def render_content(tab):
                     config={
                         'displayModeBar': True,
                         'modeBarButtonsToAdd': ['drawline', 'drawcircle', 'eraseshape'],
-                        'doubleClick': 'reset',  # 'reset', 'autosize' or 'reset+autosize', False
+                        'doubleClick': 'reset',
                     },
                 ),
             ], style={'width': '80%', 'display': 'inline-block', 'vertical-align': 'middle'}),
@@ -139,6 +134,7 @@ def render_content(tab):
                     '''**Contributing Factors**'''
                 ),
                 dcc.Checklist(
+                    #checklist for forcings (https://dash.plotly.com/dash-core-components/checklist)
                     id='forcing_checklist',
                     options=[
                         {'label': 'Volcanic', 'value': 'V'},
@@ -153,6 +149,7 @@ def render_content(tab):
                 ),
 
                 dcc.Checklist(
+                    #checkbox if they want to plot the sum of multiple factors
                     id='add_forcings',
                     options=[
                         {'label': 'Sum selected factors', 'value': 'add_forcings'},
@@ -164,6 +161,7 @@ def render_content(tab):
                     '''**Units**'''
                 ),
                 dcc.RadioItems(
+                    #radiobuttons to choose to plot in celsius or fahrenheit
                     id='units',
                     options=[
                         {'label': 'Celsius', 'value': 'C'},
@@ -175,12 +173,12 @@ def render_content(tab):
 
             html.Div([
                 dcc.Textarea(
+                    #text box to type in student information
                     id='text_area',
                     value='Name: \nStudent Number: \nComments: ',
                     style={'width': '70%', 'height': 150, 'margin-left': '80px'},
                 ),
             ])
-
         ])
 
 
@@ -191,23 +189,21 @@ def render_content(tab):
     Input(component_id='forcing_radiobuttons', component_property='value'),
 )
 def update_description(forcing):
+    #update the desctiption below the plot for the 'learn' tab
     output = []
-
     if forcing is not None:
         output += descriptions[forcing]
-
     return output
 
 def update_learn_factors(fig, factors, units):
+    #decide which data to use based on units
     if units == 'C':
         data = climate_forcings_data_c
     elif units == 'F':
         data = climate_forcings_data_f
 
-    xlim = fig['layout']['xaxis']['range']
-
     #colors: https://www.w3schools.com/cssref/css_colors.asp
-    #error bars: https://plotly.com/python/continuous-error-bars/
+    #several arrays with the properties of each factor so I can loop through them all to update
     colour_name = ['DeepSkyBlue', 'Orange', 'Red', 'Sienna', 'CadetBlue', 'MediumSlateBlue', 'SeaGreen', 'GreenYellow', 'DarkGrey', 'Purple']
     colour_rgb = ['rgba(0, 191, 255, 0.2)', 'rgba(255, 165, 0, 0.2)', 'rgba(255, 0, 0, 0.2)', 'rgba(136, 45, 23, 0.2)', 'rgba(95, 158, 160, 0.2)',
                   'rgba(123, 104, 238, 0.2)', 'rgba(46, 139, 87, 0.2)', 'rgba(173, 255, 47, 0.2)', 'rgba(169, 169, 169, 0.2)', 'rgba(128, 0, 128, 0.2)']
@@ -218,6 +214,8 @@ def update_learn_factors(fig, factors, units):
                'Natural', 'Human', 'All forcings']
     for i in range(10):
         if name[i] in factors:
+            # error bars: https://plotly.com/python/continuous-error-bars/
+            #start with empty data for the 'learn' tab, and it will be plotted when 'play' is pressed
             new_fig = px.line(data, x=None, y=None, color_discrete_sequence=[colour_name[i]])
             new_fig.update_traces(hovertemplate="Year: %{x}<br>" + label_name[i] + ": %{y:.3f}")
             new_fig_error = go.Figure([
@@ -227,23 +225,23 @@ def update_learn_factors(fig, factors, units):
                            marker=dict(color="#444"), line=dict(width=0), mode='lines', fillcolor=colour_rgb[i],
                            fill='tonexty', showlegend=False)
             ])
-            fig.update_xaxes(range=[1880, 2010])
-            fig.update_layout(showlegend=False)
 
-            new_fig_error.update_traces(hovertemplate="Year: %{x}<br>" + label_name[i] + ": %{y:.3f}")
-            fig.add_traces(new_fig_error.data)
+            new_fig_error.update_traces(hovertemplate="Year: %{x}<br>" + label_name[i] + ": %{y:.3f}") #format how many decimals are seen when we hover over data
+            fig.add_traces(new_fig_error.data) #add the traces to the main figure
             fig.add_trace(new_fig.data[0])
 
             #animation from: https://stackoverflow.com/questions/62231223/animated-lineplot-with-python-plotly
             fig.update(frames=[
                 go.Frame(
                     data=[
+                        #add frames for the full data, including error bars.
                         go.Scatter(x=data['Year'][:k], y=(data[df_name[i]] + data['Error'])[:k]),
                         go.Scatter(x=data['Year'][:k], y=(data[df_name[i]] - data['Error'])[:k]),
                         go.Scatter(x=data['Year'][:k], y=data[df_name[i]][:k])]
                 )
                 for k in range(1, len(data) + 1)])
 
+            #update layout for animation. Add play, pause buttons, give animation parameters
             fig.update_layout(
                 updatemenus=[dict(
                         type= 'buttons',
@@ -262,19 +260,20 @@ def update_learn_factors(fig, factors, units):
                                         transition= {"duration": 0})])
                                  ])])
 
-            #fig.write_html(auto_play=True)
-
-
+    fig.update_xaxes(range=[1880, 2010])  # update the xaxis because plotting empty data changes xrange
+    fig.update_layout(showlegend=False)  # we don't want to show traces in the legend
     return fig
 
 
 def update_explore_factors(fig, factors, units):
+    #update which data we use based on units
     if units == 'C':
         data = climate_forcings_data_c
     elif units == 'F':
         data = climate_forcings_data_f
+
     #colors: https://www.w3schools.com/cssref/css_colors.asp
-    #error bars: https://plotly.com/python/continuous-error-bars/
+    #
     colour_name = ['DeepSkyBlue', 'Orange', 'Red', 'Sienna', 'CadetBlue', 'MediumSlateBlue', 'SeaGreen', 'GreenYellow', 'DarkGrey', 'Purple']
     colour_rgb = ['rgba(0, 191, 255, 0.2)', 'rgba(255, 165, 0, 0.2)', 'rgba(255, 0, 0, 0.2)', 'rgba(136, 45, 23, 0.2)', 'rgba(95, 158, 160, 0.2)',
                   'rgba(123, 104, 238, 0.2)', 'rgba(46, 139, 87, 0.2)', 'rgba(173, 255, 47, 0.2)', 'rgba(169, 169, 169, 0.2)', 'rgba(128, 0, 128, 0.2)']
@@ -285,6 +284,7 @@ def update_explore_factors(fig, factors, units):
                'Natural', 'Human', 'All forcings']
     for i in range(10):
         if name[i] in factors:
+            # error bars: https://plotly.com/python/continuous-error-bars/
             new_fig = px.line(data, x='Year', y=df_name[i], color_discrete_sequence=[colour_name[i]])
             new_fig.update_traces(hovertemplate="Year: %{x}<br>" + label_name[i] + ": %{y:.3f}")
             new_fig_error = go.Figure([
@@ -357,14 +357,14 @@ def update_plot(forcing, units):
         fig.update_yaxes(title='Temperature  Anomaly (ºC)', range=[-1.2, 1.2])
         # annotation
         fig.add_annotation(x=2005, y=0.938064516129032,
-                           text="<b>observed<br>temperature</b>",
+                           text="<b>observed<br>temperature anomaly</b>",
                            showarrow=True,
                            arrowhead=1)
     elif units == 'F':
         fig.update_yaxes(title='Temperature  Anomaly (ºF)', range=[-1.2*1.8, 1.2*1.8])
         # annotation
         fig.add_annotation(x=2005, y=0.938064516129032*1.8,
-                           text="<b>observed<br>temperature</b>",
+                           text="<b>observed<br>temperature anomaly</b>",
                            showarrow=True,
                            arrowhead=1)
 
@@ -443,14 +443,14 @@ def update_plot(forcings, add_forcings, text_input, units):
         fig.update_yaxes(title='Temperature Anomaly (ºC)', range=[-1.2, 1.2])
         # annotation
         fig.add_annotation(x=2005, y=0.938064516129032,
-                           text="<b>observed<br>temperature</b>",
+                           text="<b>observed<br>temperature anomaly</b>",
                            showarrow=True,
                            arrowhead=1)
     elif units == 'F':
         fig.update_yaxes(title='Temperature Anomaly (ºF)', range=[-1.2*1.8, 1.2*1.8])
         # annotation
         fig.add_annotation(x=2005, y=0.938064516129032*1.8,
-                           text="<b>observed<br>temperature</b>",
+                           text="<b>observed<br>temperature anomaly</b>",
                            showarrow=True,
                            arrowhead=1)
 
