@@ -273,7 +273,6 @@ def update_explore_factors(fig, factors, units):
         data = climate_forcings_data_f
 
     #colors: https://www.w3schools.com/cssref/css_colors.asp
-    #
     colour_name = ['DeepSkyBlue', 'Orange', 'Red', 'Sienna', 'CadetBlue', 'MediumSlateBlue', 'SeaGreen', 'GreenYellow', 'DarkGrey', 'Purple']
     colour_rgb = ['rgba(0, 191, 255, 0.2)', 'rgba(255, 165, 0, 0.2)', 'rgba(255, 0, 0, 0.2)', 'rgba(136, 45, 23, 0.2)', 'rgba(95, 158, 160, 0.2)',
                   'rgba(123, 104, 238, 0.2)', 'rgba(46, 139, 87, 0.2)', 'rgba(173, 255, 47, 0.2)', 'rgba(169, 169, 169, 0.2)', 'rgba(128, 0, 128, 0.2)']
@@ -302,7 +301,9 @@ def update_explore_factors(fig, factors, units):
 
     return fig
 
+#function to sum all selected factors and plot one line (used by 'explore' tab)
 def add_factors(fig, factors, units):
+    #select data based on units
     if units == 'C':
         data = climate_forcings_data_c
     elif units == 'F':
@@ -313,10 +314,11 @@ def add_factors(fig, factors, units):
     name = ['OC', 'S', 'V', 'LU', 'O', 'A', 'GG', 'N', 'H', 'ALL']
     df_name = ['Orbital changes', 'Solar', 'Volcanic', 'Land use', 'Ozone', 'Anthropogenic tropospheric aerosol', 'Greenhouse gases',
                'Natural', 'Human', 'All forcings']
-    for i in range(10):
+    for i in range(10): #loop through each factor and if it is selected, add its values to 'y'
         if name[i] in factors:
             y += data[df_name[i]]
 
+    #plotting. Done the same as in previous functions.
     new_fig = px.line(x=data['Year'], y=y, color_discrete_sequence=['purple'])
     new_fig.update_traces(hovertemplate="Year: %{x}<br> Summed Factors: %{y:.3f}")
     new_fig_error = go.Figure([
@@ -339,7 +341,8 @@ def add_factors(fig, factors, units):
     Input(component_id='forcing_radiobuttons', component_property='value'),
     Input(component_id='units', component_property='value'),
 )
-def update_plot(forcing, units):
+def update_learn_plot(forcing, units):
+    #check units to get appropriate data
     if units == 'C':
         data = land_ocean_data_c
     if units == 'F':
@@ -347,12 +350,18 @@ def update_plot(forcing, units):
 
     factors = [forcing]
 
+    #add axis lines
     fig = px.line()
     fig.update_layout(plot_bgcolor='rgb(255, 255, 255)', yaxis_zeroline=True, yaxis_zerolinecolor='gainsboro', yaxis_showline=True, yaxis_linecolor='gainsboro')
+
+    #plot the forcings on the figure
     fig = update_learn_factors(fig, factors, units)
+    #add the observed temperature anomoly line
     figTemp = px.line(data, x='Year', y='Annual_Mean', color_discrete_sequence=['black'])
     figTemp.update_traces(hovertemplate="Year: %{x}<br>Annual Mean: %{y:.3f}")
     fig.add_trace(figTemp.data[0])
+
+    #update yaxis based on unit, and add the annotation for observed temperature anomaly
     if units == 'C':
         fig.update_yaxes(title='Temperature  Anomaly (ºC)', range=[-1.2, 1.2])
         # annotation
@@ -367,19 +376,20 @@ def update_plot(forcing, units):
                            text="<b>observed<br>temperature anomaly</b>",
                            showarrow=True,
                            arrowhead=1)
-
-
     return fig
 
+
+#function to update the student comments as an annotation on the 'explore' plot.
 def update_text(fig, text_input):
     text_output = ''
     for chr in text_input:
-        if (ord(chr) == 10) | (ord(chr) == 13):
+        if (ord(chr) == 10) | (ord(chr) == 13): #replace 'enter' from the input with '<br>' to make a line break
             text_output += '<br>'
         else:
             text_output += chr
 
     #character limit = 80
+    #if a line is longer than 80 characters, wrap it to the next line.
     output = text_output.split('<br>')
     new_output = ''
     for i in output:
@@ -392,7 +402,7 @@ def update_text(fig, text_input):
 
     text_output = new_output
 
-
+    #update the annotation on the figure with our text
     fig.update_layout(margin=dict(b=150))
     fig.update_layout(annotations=[
         go.layout.Annotation(
@@ -419,26 +429,33 @@ def update_text(fig, text_input):
     Input(component_id='text_area', component_property='value'),
     Input(component_id='units', component_property='value')
 )
-def update_plot(forcings, add_forcings, text_input, units):
+def update_explore_plot(forcings, add_forcings, text_input, units):
+    #select data based on units
     if units == 'C':
         data = land_ocean_data_c
     if units == 'F':
         data = land_ocean_data_f
 
+    #add axis lines
     fig = px.line()
     fig.update_layout(plot_bgcolor='rgb(255, 255, 255)', yaxis_zeroline=True, yaxis_zerolinecolor='gainsboro',
                       yaxis_showline=True, yaxis_linecolor='gainsboro')
 
+    #if the checkbox to sum selected factors is checked, we call 'add_factors'. Otherwise we plot like normal with 'update_explore_factors'
     if add_forcings != ['add_forcings']:
         fig = update_explore_factors(fig, forcings, units)
     elif len(forcings) > 0:
         fig = add_factors(fig, forcings, units)
+
+    #plot the observed temperature anomaly
     figTemp = px.line(data, x='Year', y='Annual_Mean', color_discrete_sequence=['black'])
     fig.add_trace(figTemp.data[0])
 
+    #update the annotation on the graph with student comments
     if text_input != None:
         fig = update_text(fig, text_input)
 
+    #update yaxis range based on units, and add the annotation for 'observed temperature anomaly'
     if units == 'C':
         fig.update_yaxes(title='Temperature Anomaly (ºC)', range=[-1.2, 1.2])
         # annotation
@@ -454,13 +471,13 @@ def update_plot(forcings, add_forcings, text_input, units):
                            showarrow=True,
                            arrowhead=1)
 
+    #add the ability to draw on the plot
     fig.update_layout(
         #dragmode='drawline',
         newshape=dict(line_color='magenta'),
         height=500
     )
-
-
+    
     return fig
 
 
