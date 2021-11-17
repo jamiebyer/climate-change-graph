@@ -48,7 +48,7 @@ app.layout = html.Div(
                 ),
             ],
             style={
-                "width": "80%",
+                "width": "100%",
                 "display": "inline-block",
                 "padding": "0 20",
                 "vertical-align": "middle",
@@ -73,7 +73,7 @@ app.layout = html.Div(
                 html.Div(id="tabs-content"),
             ],
             style={
-                "width": "80%",
+                "width": "100%",
                 "display": "inline-block",
                 "padding": "0 20",
                 "vertical-align": "middle",
@@ -82,8 +82,12 @@ app.layout = html.Div(
                 "margin-left": 20,
             },
         ),
+        html.Iframe(
+            src="https://ubc.ca1.qualtrics.com/jfe/form/SV_9zS1U0C7odSt76K",
+            style={"height": "800px", "width": "100%", "margin-left": 20,},
+        ),
     ],
-    style={"width": "1200px"},
+    style={"width": "1000px"},
 )
 
 
